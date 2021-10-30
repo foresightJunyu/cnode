@@ -11,7 +11,7 @@
           <span>客户端测试</span>
         </div>
         <li v-for="post in posts">
-          <img :src="post.author.avatar_url" alt="">
+          <img :src="post.author.avatar_url">
           <span :class="[{put_good:(post.good == true),
             put_top:(post.top == true),
             'topicList-tab':(post.good !== true && post.top!==true)}]">
@@ -21,9 +21,12 @@
             <span class="reply_count">{{ post.reply_count }}</span>
             /{{ post.visit_count }}
           </span>
-          <span class="title">
+          <router-link :to="{name:'post_content',params:{id:post.id}}">
+            <span class="title">
             {{ post.title }}
           </span>
+          </router-link>
+
           <span class="last_reply">
             {{ post.last_reply_at | formatDate }}
           </span>
@@ -34,10 +37,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { Component } from 'vue-property-decorator'
+import Vue from 'vue';
+import {Component} from 'vue-property-decorator';
 
-const axios = require('axios').default
+const axios = require('axios').default;
 
 @Component
 
@@ -55,25 +58,23 @@ export default class PostList extends Vue {
   //   }
   //   return adapter;
   // }
-  getData () {
+  getData() {
     this.$axios.get('https://cnodejs.org/api/v1/topics', {
       page: 1,
       limit: 20
     })
-      .then(res => {
-        console.log(res)
-        // @ts-ignore
-        this.posts = res.data.data
-
-        console.log(this.posts)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+        .then(res => {
+          console.log('res');
+          // @ts-ignore
+          this.posts = res.data.data;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
   }
 
-  beforeMount () {
-    this.getData()
+  beforeMount() {
+    this.getData();
   }
 }
 </script>
