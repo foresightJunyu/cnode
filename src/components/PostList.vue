@@ -21,7 +21,12 @@
             <span class="reply_count">{{ post.reply_count }}</span>
             /{{ post.visit_count }}
           </span>
-          <router-link :to="{name:'post_content',params:{id:post.id}}">
+          <router-link :to="{
+            name:'post_content',
+            params:{
+              id:post.id,
+              name:post.author.loginname
+            }}">
             <span class="title">
             {{ post.title }}
           </span>
@@ -31,6 +36,10 @@
             {{ post.last_reply_at | formatDate }}
           </span>
         </li>
+        <!--分页-->
+        <li>
+          <Pagination @handleList="renderList"/>
+        </li>
       </ul>
     </div>
   </div>
@@ -39,14 +48,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import {Component} from 'vue-property-decorator';
+import Pagination from "@/components/Pagination.vue";
 
 const axios = require('axios').default;
-
-@Component
+@Component({
+  components: {Pagination}
+})
 
 export default class PostList extends Vue {
   posts: Array<[]> = [];
   props?: ['classSuffix'];
+  postpage: 1;
   // getDefaultAdapter() {
   //   let adapter;
   //   if (typeof XMLHttpRequest !== 'undefined') {
@@ -60,17 +72,24 @@ export default class PostList extends Vue {
   // }
   getData() {
     this.$axios.get('https://cnodejs.org/api/v1/topics', {
-      page: 1,
-      limit: 20
+      params: {
+        page: this.postpage,
+        limit: 20
+      }
+
     })
         .then(res => {
-          console.log('res');
           // @ts-ignore
           this.posts = res.data.data;
         })
         .catch(function (error) {
           console.log(error);
         });
+  }
+
+  renderList(value) {
+    this.postpage = value;
+    this.getData();
   }
 
   beforeMount() {
